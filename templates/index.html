@@ -1,0 +1,2452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriLens AI - Smart Food & Calorie Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Primary - Soft Lavender */
+            --primary-600: #7C3AED;
+            --primary-500: #8B5CF6;
+            --primary-400: #A78BFA;
+            --primary-300: #C4B5FD;
+            --primary-100: #EDE9FE;
+            --primary-50: #F5F3FF;
+            
+            /* Secondary - Soft Peach */
+            --peach-500: #FF8A65;
+            --peach-400: #FFAB91;
+            --peach-300: #FFCCBC;
+            --peach-100: #FFECE6;
+            
+            /* Accent - Soft Mint */
+            --mint-500: #4ADE80;
+            --mint-400: #86EFAC;
+            --mint-100: #DCFCE7;
+            
+            /* Neutrals */
+            --gray-900: #1E1B4B;
+            --gray-700: #4C4A6A;
+            --gray-500: #6B7280;
+            --gray-400: #9CA3AF;
+            --gray-200: #E5E7EB;
+            --gray-100: #F3F4F6;
+            --white: #FFFFFF;
+            
+            /* Background */
+            --bg-main: linear-gradient(135deg, #F5F3FF 0%, #EDE9FE 50%, #FDF2F8 100%);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            
+            /* Shadows */
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-main);
+            min-height: 100vh;
+            color: var(--gray-900);
+            line-height: 1.6;
+        }
+
+        /* Header - Modern Soft Design */
+        .header {
+            background: linear-gradient(135deg, rgba(255,255,255,0.9) 0%, rgba(245,243,255,0.95) 100%);
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border-bottom: 1px solid var(--primary-100);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            right: -50%;
+            bottom: -50%;
+            background: radial-gradient(ellipse at 30% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 50%),
+                        radial-gradient(ellipse at 70% 80%, rgba(255, 138, 101, 0.06) 0%, transparent 50%);
+            animation: float 15s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translate(0, 0) rotate(0deg); }
+            33% { transform: translate(20px, -20px) rotate(1deg); }
+            66% { transform: translate(-10px, 10px) rotate(-1deg); }
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 2em;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-400) 50%, var(--peach-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo::before {
+            content: '🥗';
+            font-size: 0.85em;
+            filter: drop-shadow(0 2px 4px rgba(139, 92, 246, 0.3));
+        }
+
+        .tagline {
+            color: var(--gray-500);
+            font-size: 0.9em;
+            font-weight: 400;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .header-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 5px 14px;
+            background: linear-gradient(135deg, var(--primary-100) 0%, var(--peach-100) 100%);
+            border: 1px solid var(--primary-300);
+            border-radius: 20px;
+            font-size: 0.75em;
+            color: var(--primary-600);
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 25px 20px;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 1000px) {
+            .main-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Cards - Glassmorphism */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 28px;
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl), var(--shadow-glow);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid var(--primary-100);
+        }
+
+        .card-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-400) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4em;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .card-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4em;
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+
+        /* Upload Area - Modern */
+        .upload-container {
+            position: relative;
+        }
+
+        .upload-area {
+            border: 2px dashed var(--primary-300);
+            border-radius: 24px;
+            padding: 45px 35px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05) 0%, rgba(255, 138, 101, 0.05) 100%);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .upload-area::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(139, 92, 246, 0.1) 0%, transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .upload-area:hover {
+            border-color: var(--primary-500);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(167, 139, 250, 0.12) 100%);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .upload-area:hover::before {
+            opacity: 1;
+        }
+
+        .upload-area.dragover {
+            border-color: var(--primary-600);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.15) 0%, rgba(124, 58, 237, 0.1) 100%);
+            transform: scale(1.02);
+        }
+
+        .upload-icon-large {
+            font-size: 3.5em;
+            margin-bottom: 16px;
+            display: block;
+            filter: drop-shadow(0 4px 6px rgba(139, 92, 246, 0.2));
+        }
+
+        .upload-text {
+            color: var(--gray-700);
+            font-size: 1.1em;
+            margin-bottom: 20px;
+            font-weight: 500;
+        }
+
+        .upload-subtext {
+            color: var(--gray-500);
+            font-size: 0.9em;
+            margin-bottom: 22px;
+        }
+
+        .upload-btn {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.35);
+        }
+
+        .upload-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.45);
+        }
+
+        #file-input {
+            display: none;
+        }
+
+        /* Preview */
+        .preview-container {
+            margin-top: 20px;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+            position: relative;
+            border: 1px solid var(--primary-100);
+        }
+
+        .clear-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--peach-400) 0%, var(--peach-500) 100%);
+            color: var(--white);
+            border: none;
+            padding: 12px;
+            border-radius: 0 0 16px 16px;
+            font-size: 0.95em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: -4px;
+        }
+
+        .clear-btn:hover {
+            background: linear-gradient(135deg, var(--peach-500) 0%, var(--peach-400) 100%);
+        }
+
+        .preview-image {
+            width: 100%;
+            max-height: 320px;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Options - Modern */
+        .options-section {
+            margin-top: 22px;
+            padding: 20px;
+            background: linear-gradient(135deg, var(--primary-50) 0%, var(--peach-100) 100%);
+            border-radius: 16px;
+            border: 1px solid var(--primary-200);
+        }
+
+        .option-label {
+            display: block;
+            margin-bottom: 10px;
+            color: var(--gray-700);
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        .option-select {
+            width: 100%;
+            padding: 14px 18px;
+            border: 2px solid var(--primary-200);
+            border-radius: 12px;
+            font-size: 0.95em;
+            background: var(--white);
+            color: var(--gray-700);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%237C3AED' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 40px;
+        }
+
+        .option-select:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Analyze Button - Modern Gradient */
+        .analyze-btn {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 50%, var(--peach-500) 100%);
+            color: var(--white);
+            border: none;
+            padding: 16px;
+            border-radius: 14px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 22px;
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .analyze-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(139, 92, 246, 0.4);
+        }
+
+        .analyze-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Results Card */
+        .results-card {
+            min-height: 450px;
+            position: relative;
+        }
+
+        .placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            min-height: 350px;
+            color: var(--primary-400);
+            text-align: center;
+        }
+
+        .placeholder-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+            filter: drop-shadow(0 4px 6px rgba(139, 92, 246, 0.2));
+        }
+
+        .placeholder h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.4em;
+            color: var(--gray-900);
+            margin-bottom: 8px;
+        }
+
+        .placeholder p {
+            color: var(--gray-500);
+            font-size: 1em;
+            max-width: 280px;
+        }
+
+        /* Loading - Modern */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 50px 40px;
+        }
+
+        .spinner-container {
+            position: relative;
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 25px;
+        }
+
+        .spinner {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border: 4px solid rgba(139, 92, 246, 0.15);
+            border-top-color: var(--primary-500);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .spinner-inner {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            right: 10px;
+            bottom: 10px;
+            border: 4px solid rgba(255, 138, 101, 0.15);
+            border-top-color: var(--peach-500);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite reverse;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--gray-700);
+            font-size: 1.15em;
+            font-weight: 500;
+        }
+
+        .loading-subtext {
+            color: var(--gray-500);
+            margin-top: 8px;
+            font-size: 0.95em;
+        }
+
+        /* Results Content */
+        .results-content {
+            display: none;
+        }
+
+        /* Prediction Header - Modern */
+        .prediction-header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 22px;
+            background: linear-gradient(135deg, var(--primary-50) 0%, var(--peach-100) 100%);
+            border-radius: 18px;
+            border: 1px solid var(--primary-200);
+        }
+
+        .food-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.9em;
+            color: var(--gray-900);
+            text-transform: capitalize;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .confidence-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .confidence-badge {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+        }
+
+        .confidence-meter {
+            width: 180px;
+            height: 8px;
+            background: var(--gray-200);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .confidence-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-500) 0%, var(--peach-500) 100%);
+            transition: width 0.8s ease;
+            border-radius: 4px;
+        }
+
+        /* Calorie Display - Modern Gradient */
+        .calorie-display {
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-500) 50%, var(--peach-500) 100%);
+            color: var(--white);
+            border-radius: 20px;
+            padding: 28px;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 35px rgba(139, 92, 246, 0.35);
+        }
+
+        .calorie-display::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+            opacity: 0.6;
+        }
+
+        .calorie-icon {
+            font-size: 2.2em;
+            margin-bottom: 12px;
+            display: block;
+        }
+
+        .calorie-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 3.5em;
+            font-weight: 700;
+            margin-bottom: 3px;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255,255,255,0.9) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .calorie-unit {
+            font-size: 1.05em;
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 300;
+        }
+
+        /* Info Badges */
+        .info-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 18px;
+        }
+
+        .info-badge {
+            flex: 1;
+            min-width: 130px;
+            background: linear-gradient(135deg, var(--primary-50) 0%, rgba(255, 138, 101, 0.08) 100%);
+            border: 1px solid var(--primary-200);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 0.8em;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .info-value {
+            font-size: 1.05em;
+            font-weight: 600;
+            color: var(--gray-900);
+        }
+
+        /* Sections - Modern */
+        .section {
+            margin-bottom: 18px;
+            padding: 18px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 16px;
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .section-icon {
+            width: 34px;
+            height: 34px;
+            background: linear-gradient(135deg, var(--primary-400) 0%, var(--peach-400) 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1em;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15em;
+            color: var(--gray-900);
+            font-weight: 600;
+        }
+
+        /* Variation Badge - Modern */
+        .variation-display {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .variation-badge {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-400) 100%);
+            color: var(--white);
+            padding: 10px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            text-transform: capitalize;
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+        }
+
+        .variation-confidence {
+            color: var(--gray-500);
+            font-size: 0.9em;
+        }
+
+        .variation-description {
+            color: var(--gray-700);
+            margin-top: 12px;
+            font-size: 1em;
+            line-height: 1.5;
+            padding: 14px;
+            background: rgba(139, 92, 246, 0.08);
+            border-radius: 12px;
+            border-left: 3px solid var(--primary-500);
+        }
+
+        /* Ingredients - Modern */
+        .ingredients-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .ingredient-tag {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(167, 139, 250, 0.1) 100%);
+            color: var(--primary-600);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .ingredient-tag:hover {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        /* Calorie Breakdown - Modern */
+        .breakdown-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(255, 138, 101, 0.04) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.15);
+        }
+
+        .breakdown-name {
+            color: var(--gray-700);
+            font-weight: 500;
+        }
+
+        .breakdown-portion {
+            color: var(--gray-500);
+            font-size: 0.8em;
+        }
+
+        .breakdown-calories {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.25);
+        }
+
+        /* Alternatives - Modern */
+        .alternatives-grid {
+            display: grid;
+            gap: 10px;
+        }
+
+        .alternatives-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(255, 138, 101, 0.08) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .alternatives-header-icon {
+            font-size: 1.3em;
+        }
+
+        .alternatives-header-text {
+            font-size: 0.9em;
+            color: var(--gray-600);
+            font-weight: 500;
+        }
+
+        .alternatives-count {
+            margin-left: auto;
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            padding: 4px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+        }
+
+        .alternative-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.06) 0%, rgba(255, 138, 101, 0.04) 100%);
+            border-radius: 12px;
+            border: 1px solid rgba(139, 92, 246, 0.15);
+            transition: all 0.3s ease;
+        }
+
+        .alternative-item:hover {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(255, 138, 101, 0.08) 100%);
+            border-color: rgba(139, 92, 246, 0.25);
+            transform: translateX(4px);
+        }
+
+        .alternative-name {
+            color: var(--gray-700);
+            font-weight: 600;
+            text-transform: capitalize;
+        }
+
+        .alternative-calories {
+            background: linear-gradient(135deg, var(--peach-400) 0%, var(--peach-500) 100%);
+            color: var(--white);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(255, 138, 101, 0.3);
+        }
+
+        /* Nutrition Grid - Modern */
+        .nutrition-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+
+        @media (max-width: 600px) {
+            .nutrition-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .nutrition-item {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            padding: 18px 12px;
+            border-radius: 14px;
+            text-align: center;
+            color: var(--white);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.25);
+        }
+
+        .nutrition-value {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6em;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .nutrition-label {
+            font-size: 0.8em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Error - Modern */
+        .error-message {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.05) 100%);
+            color: #DC2626;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin-top: 15px;
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Voice Input Section */
+        .voice-section {
+            margin: 20px 0;
+        }
+
+        .voice-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 20px 0;
+            color: var(--gray-400);
+            font-size: 0.85em;
+        }
+
+        .voice-divider::before,
+        .voice-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .voice-divider-text {
+            padding: 0 15px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .voice-input-container {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(255, 138, 101, 0.05) 100%);
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .voice-input-container:hover {
+            border-color: rgba(139, 92, 246, 0.5);
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.12) 0%, rgba(255, 138, 101, 0.08) 100%);
+        }
+
+        .voice-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+
+        .voice-icon {
+            font-size: 1.5em;
+        }
+
+        .voice-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--gray-700);
+        }
+
+        .voice-subtitle {
+            font-size: 0.9em;
+            color: var(--gray-500);
+            margin-bottom: 16px;
+        }
+
+        .voice-btn {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            border: none;
+            padding: 14px 28px;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .voice-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .voice-btn.recording {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .voice-btn-icon {
+            font-size: 1.2em;
+        }
+
+        .voice-status {
+            margin-top: 16px;
+            padding: 16px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 12px;
+        }
+
+        .voice-waves {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 4px;
+            height: 40px;
+            margin-bottom: 10px;
+        }
+
+        .voice-waves span {
+            display: inline-block;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary-500), var(--peach-500));
+            border-radius: 2px;
+            animation: wave 1s ease-in-out infinite;
+        }
+
+        .voice-waves span:nth-child(1) { height: 20%; animation-delay: 0s; }
+        .voice-waves span:nth-child(2) { height: 40%; animation-delay: 0.1s; }
+        .voice-waves span:nth-child(3) { height: 60%; animation-delay: 0.2s; }
+        .voice-waves span:nth-child(4) { height: 40%; animation-delay: 0.3s; }
+        .voice-waves span:nth-child(5) { height: 20%; animation-delay: 0.4s; }
+
+        @keyframes wave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.5); }
+        }
+
+        .voice-listening-text {
+            color: var(--primary-600);
+            font-weight: 500;
+            margin: 0;
+        }
+
+        .voice-text-display {
+            margin-top: 16px;
+            padding: 12px 16px;
+            background: rgba(74, 222, 128, 0.1);
+            border: 1px solid rgba(74, 222, 128, 0.3);
+            border-radius: 10px;
+            text-align: left;
+        }
+
+        .voice-detected-label {
+            font-size: 0.8em;
+            color: var(--gray-500);
+            margin: 0 0 4px 0;
+        }
+
+        .voice-detected-text {
+            font-size: 1em;
+            color: var(--gray-700);
+            margin: 0;
+            font-style: italic;
+        }
+
+        .voice-ingredients-list {
+            margin-top: 16px;
+            text-align: left;
+        }
+
+        .voice-ingredients-label {
+            font-size: 0.85em;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .voice-ingredients-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .voice-ingredient-tag {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .voice-analyze-btn {
+            margin-top: 16px;
+            background: linear-gradient(135deg, var(--mint-500) 0%, var(--peach-500) 100%);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(74, 222, 128, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .voice-analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 222, 128, 0.4);
+        }
+
+        /* Edit Ingredients Feature */
+        .edit-ingredients-btn {
+            margin-left: auto;
+            background: linear-gradient(135deg, var(--peach-400) 0%, var(--peach-500) 100%);
+            color: var(--white);
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 2px 8px rgba(255, 138, 101, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .edit-ingredients-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(255, 138, 101, 0.4);
+        }
+
+        .edit-ingredients-panel {
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.08) 0%, rgba(255, 138, 101, 0.05) 100%);
+            border: 2px dashed rgba(139, 92, 246, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            margin-top: 15px;
+        }
+
+        .edit-label {
+            font-size: 0.9em;
+            font-weight: 600;
+            color: var(--gray-600);
+            margin-bottom: 10px;
+        }
+
+        .current-ingredients-edit {
+            margin-bottom: 20px;
+        }
+
+        .edit-ingredients-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .edit-ingredient-tag {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .edit-ingredient-tag:hover {
+            background: linear-gradient(135deg, #EF4444 0%, #DC2626 100%);
+            transform: scale(1.05);
+        }
+
+        .edit-ingredient-tag .remove-icon {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .add-ingredient-section {
+            margin-bottom: 20px;
+        }
+
+        .add-ingredient-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .add-ingredient-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 2px solid rgba(139, 92, 246, 0.2);
+            border-radius: 12px;
+            font-size: 0.95em;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--gray-700);
+            transition: all 0.3s ease;
+        }
+
+        .add-ingredient-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+        }
+
+        .add-ingredient-btn {
+            background: linear-gradient(135deg, var(--mint-500) 0%, #10B981 100%);
+            color: var(--white);
+            border: none;
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 12px rgba(74, 222, 128, 0.3);
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .add-ingredient-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(74, 222, 128, 0.4);
+        }
+
+        .suggested-ingredients {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .suggested-tag {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--primary-600);
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+        }
+
+        .suggested-tag:hover {
+            background: var(--primary-500);
+            color: var(--white);
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .recalculate-btn {
+            background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%);
+            color: var(--white);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .recalculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.4);
+        }
+
+        .cancel-edit-btn {
+            background: rgba(156, 163, 175, 0.2);
+            color: var(--gray-600);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .cancel-edit-btn:hover {
+            background: rgba(156, 163, 175, 0.3);
+            color: var(--gray-700);
+        }
+
+        /* Footer - Modern */
+        .footer {
+            text-align: center;
+            padding: 25px 20px;
+            color: var(--gray-500);
+            font-size: 0.85em;
+            border-top: 1px solid rgba(139, 92, 246, 0.15);
+            margin-top: 10px;
+        }
+
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.1em;
+            background: linear-gradient(135deg, var(--primary-600) 0%, var(--peach-500) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+        }
+
+        .footer-brand::before {
+            content: '🥗';
+            font-size: 0.9em;
+            -webkit-text-fill-color: initial;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <h1 class="logo">NutriLens AI</h1>
+            <p class="tagline">Smart Food Recognition & Calorie Analysis</p>
+            <div class="header-badge">
+                <span>✨</span> AI-Powered Nutrition Intelligence
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <div class="container">
+        <div class="main-grid">
+            <!-- Upload Card -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📸</div>
+                    <h2 class="card-title">Upload Food Image</h2>
+                </div>
+
+                <div class="upload-container">
+                    <div class="upload-area" id="upload-area">
+                        <span class="upload-icon-large">🍃</span>
+                        <p class="upload-text">Drop your food photo here</p>
+                        <p class="upload-subtext">or click to browse your files</p>
+                        <button class="upload-btn">Select Image</button>
+                        <input type="file" id="file-input" accept="image/*">
+                    </div>
+
+                    <div class="preview-container" id="preview-container" style="display: none;">
+                        <img id="preview-image" class="preview-image" alt="Food Preview">
+                        <button class="clear-btn" id="clear-btn" onclick="clearAndUploadNew()">
+                            <span>🔄</span> Upload New Image
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Voice Input Section -->
+                <div class="voice-section" id="voice-section">
+                    <div class="voice-divider">
+                        <span class="voice-divider-text">OR</span>
+                    </div>
+                    <div class="voice-input-container">
+                        <div class="voice-header">
+                            <span class="voice-icon">🎙️</span>
+                            <span class="voice-title">Voice Input</span>
+                        </div>
+                        <p class="voice-subtitle">Speak your ingredients and get instant calorie analysis</p>
+                        
+                        <button class="voice-btn" id="voice-btn" onclick="startVoiceInput()">
+                            <span class="voice-btn-icon" id="voice-btn-icon">🎤</span>
+                            <span class="voice-btn-text" id="voice-btn-text">Tap & Speak Ingredients</span>
+                        </button>
+                        
+                        <div class="voice-status" id="voice-status" style="display: none;">
+                            <div class="voice-waves">
+                                <span></span><span></span><span></span><span></span><span></span>
+                            </div>
+                            <p class="voice-listening-text">Listening... Speak your ingredients</p>
+                        </div>
+                        
+                        <div class="voice-text-display" id="voice-text-display" style="display: none;">
+                            <p class="voice-detected-label">Detected:</p>
+                            <p class="voice-detected-text" id="voice-detected-text"></p>
+                        </div>
+                        
+                        <div class="voice-ingredients-list" id="voice-ingredients-list" style="display: none;">
+                            <p class="voice-ingredients-label">Ingredients Found:</p>
+                            <div class="voice-ingredients-tags" id="voice-ingredients-tags"></div>
+                        </div>
+                        
+                        <button class="voice-analyze-btn" id="voice-analyze-btn" style="display: none;" onclick="analyzeVoiceIngredients()">
+                            <span>🔍</span>
+                            <span>Analyze Ingredients</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="options-section">
+                    <label class="option-label">🍽️ Serving Size</label>
+                    <select class="option-select" id="serving-size">
+                        <option value="small">🥄 Small (70% of standard)</option>
+                        <option value="medium" selected>🍽️ Medium (Standard portion)</option>
+                        <option value="large">🍲 Large (140% of standard)</option>
+                        <option value="extra_large">🥘 Extra Large (180% of standard)</option>
+                    </select>
+                </div>
+
+                <button class="analyze-btn" id="analyze-button" disabled>
+                    <span>🔍</span>
+                    <span>Analyze Nutrition</span>
+                </button>
+
+                <div id="error-container"></div>
+            </div>
+
+            <!-- Results Card -->
+            <div class="card results-card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <h2 class="card-title">Nutrition Analysis</h2>
+                </div>
+
+                <!-- Placeholder -->
+                <div class="placeholder" id="placeholder">
+                    <div class="placeholder-icon">🥗</div>
+                    <h3>Ready to Analyze</h3>
+                    <p>Upload a food image to get detailed calorie and nutrition information</p>
+                </div>
+
+                <!-- Loading -->
+                <div class="loading" id="loading">
+                    <div class="spinner-container">
+                        <div class="spinner"></div>
+                        <div class="spinner-inner"></div>
+                    </div>
+                    <p class="loading-text">Analyzing your food...</p>
+                    <p class="loading-subtext">Detecting ingredients & calculating nutrition</p>
+                </div>
+
+                <!-- Results -->
+                <div class="results-content" id="results-content">
+                    <!-- Prediction Header -->
+                    <div class="prediction-header">
+                        <div class="food-name" id="food-name">Food Name</div>
+                        <div class="confidence-wrapper">
+                            <span class="confidence-badge" id="confidence-badge">Confidence: 95%</span>
+                            <div class="confidence-meter">
+                                <div class="confidence-fill" id="confidence-fill" style="width: 95%"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calorie Display -->
+                    <div class="calorie-display">
+                        <div class="calorie-content">
+                            <span class="calorie-icon">✨</span>
+                            <div class="calorie-number" id="calorie-number">350</div>
+                            <div class="calorie-unit">calories estimated</div>
+                        </div>
+                    </div>
+
+                    <!-- Info Row -->
+                    <div class="info-row">
+                        <div class="info-badge">
+                            <div class="info-label">Serving</div>
+                            <div class="info-value" id="serving-value">Medium</div>
+                        </div>
+                        <div class="info-badge">
+                            <div class="info-label">Detected</div>
+                            <div class="info-value" id="ingredients-count">8 items</div>
+                        </div>
+                    </div>
+
+                    <!-- Variation Section -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-icon">🏷️</div>
+                            <h3 class="section-title">Detected Variation</h3>
+                        </div>
+                        <div class="variation-display">
+                            <span class="variation-badge" id="variation-badge">Classic</span>
+                            <span class="variation-confidence" id="variation-confidence">Confidence: 85%</span>
+                        </div>
+                        <p class="variation-description" id="variation-description"></p>
+                    </div>
+
+                    <!-- Ingredients Section -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-icon">🥗</div>
+                            <h3 class="section-title">Detected Ingredients</h3>
+                            <button class="edit-ingredients-btn" id="edit-ingredients-btn" onclick="toggleEditIngredients()">
+                                <span>✏️</span> Edit
+                            </button>
+                        </div>
+                        
+                        <!-- Normal View -->
+                        <div class="ingredients-grid" id="ingredients-list"></div>
+                        
+                        <!-- Edit View -->
+                        <div class="edit-ingredients-panel" id="edit-ingredients-panel" style="display: none;">
+                            <div class="current-ingredients-edit" id="current-ingredients-edit">
+                                <p class="edit-label">Current Ingredients (click ✕ to remove):</p>
+                                <div class="edit-ingredients-tags" id="edit-ingredients-tags"></div>
+                            </div>
+                            
+                            <div class="add-ingredient-section">
+                                <p class="edit-label">Add New Ingredient:</p>
+                                <div class="add-ingredient-row">
+                                    <input type="text" class="add-ingredient-input" id="add-ingredient-input" 
+                                           placeholder="Type ingredient name (e.g., cheese, oil, nuts)...">
+                                    <button class="add-ingredient-btn" onclick="addIngredient()">
+                                        <span>➕</span> Add
+                                    </button>
+                                </div>
+                                <div class="suggested-ingredients" id="suggested-ingredients"></div>
+                            </div>
+                            
+                            <div class="edit-actions">
+                                <button class="recalculate-btn" onclick="recalculateCalories()">
+                                    <span>🔄</span> Recalculate Calories
+                                </button>
+                                <button class="cancel-edit-btn" onclick="cancelEditIngredients()">
+                                    <span>✕</span> Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Calorie Breakdown -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-icon">📋</div>
+                            <h3 class="section-title">Calorie Breakdown</h3>
+                        </div>
+                        <div class="breakdown-list" id="calorie-breakdown"></div>
+                    </div>
+
+                    <!-- Alternatives -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-icon">�</div>
+                            <h3 class="section-title">Healthier Alternatives</h3>
+                        </div>
+                        <div class="alternatives-header">
+                            <span class="alternatives-header-icon">🥗</span>
+                            <span class="alternatives-header-text">Lower calorie options for a healthier choice</span>
+                            <span class="alternatives-count" id="alternatives-count">0 found</span>
+                        </div>
+                        <div class="alternatives-grid" id="alternatives-list"></div>
+                    </div>
+
+                    <!-- Nutrition -->
+                    <div class="section">
+                        <div class="section-header">
+                            <div class="section-icon">📊</div>
+                            <h3 class="section-title">Nutrition per 100g</h3>
+                        </div>
+                        <div class="nutrition-grid" id="nutrition-grid"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-brand">NutriLens AI</div>
+        <p>Powered by PyTorch & Food-101 Dataset</p>
+    </footer>
+
+    <script>
+        // DOM Elements
+        const uploadArea = document.getElementById('upload-area');
+        const fileInput = document.getElementById('file-input');
+        const previewContainer = document.getElementById('preview-container');
+        const previewImage = document.getElementById('preview-image');
+        const analyzeButton = document.getElementById('analyze-button');
+        const servingSize = document.getElementById('serving-size');
+        const errorContainer = document.getElementById('error-container');
+        
+        const placeholder = document.getElementById('placeholder');
+        const loading = document.getElementById('loading');
+        const resultsContent = document.getElementById('results-content');
+
+        let selectedFile = null;
+
+        // Event Listeners
+        uploadArea.addEventListener('click', () => fileInput.click());
+        
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        analyzeButton.addEventListener('click', analyzeImage);
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please upload an image file');
+                return;
+            }
+
+            selectedFile = file;
+            
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                previewImage.src = e.target.result;
+                previewContainer.style.display = 'block';
+                uploadArea.style.display = 'none';
+                analyzeButton.disabled = false;
+            };
+            reader.readAsDataURL(file);
+
+            clearError();
+        }
+
+        function clearAndUploadNew() {
+            // Reset file input
+            fileInput.value = '';
+            selectedFile = null;
+            
+            // Hide preview and show upload area
+            previewContainer.style.display = 'none';
+            uploadArea.style.display = 'block';
+            
+            // Disable analyze button
+            analyzeButton.disabled = true;
+            
+            // Hide results and show placeholder
+            resultsContent.style.display = 'none';
+            placeholder.style.display = 'flex';
+            loading.style.display = 'none';
+            
+            // Clear any errors
+            clearError();
+            
+            // Reset serving size to medium
+            servingSize.value = 'medium';
+        }
+
+        function showError(message) {
+            errorContainer.innerHTML = `<div class="error-message"><span>⚠️</span> ${message}</div>`;
+        }
+
+        function clearError() {
+            errorContainer.innerHTML = '';
+        }
+
+        async function analyzeImage() {
+            if (!selectedFile) return;
+
+            placeholder.style.display = 'none';
+            resultsContent.style.display = 'none';
+            loading.style.display = 'block';
+            analyzeButton.disabled = true;
+
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            formData.append('serving_size', servingSize.value);
+
+            try {
+                const response = await fetch('/api/predict', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                loading.style.display = 'none';
+                analyzeButton.disabled = false;
+            }
+        }
+
+        function displayResults(data) {
+            const prediction = data.prediction;
+            const foodInfo = data.food_info;
+            const analysis = data.analysis;
+            const calorieEstimate = analysis.calorie_estimate;
+
+            // Food name and confidence
+            document.getElementById('food-name').textContent = prediction.food_class.replace(/_/g, ' ');
+            document.getElementById('confidence-badge').textContent = `Confidence: ${(prediction.confidence * 100).toFixed(1)}%`;
+            document.getElementById('confidence-fill').style.width = `${prediction.confidence * 100}%`;
+
+            // Calorie display
+            document.getElementById('calorie-number').textContent = calorieEstimate.total_calories;
+
+            // Info badges
+            const servingText = {
+                'small': 'Small', 'medium': 'Medium', 'large': 'Large', 'extra_large': 'Extra Large'
+            };
+            document.getElementById('serving-value').textContent = servingText[calorieEstimate.serving_size];
+            document.getElementById('ingredients-count').textContent = 
+                `${calorieEstimate.detected_ingredients?.length || 0} items`;
+
+            // Variation
+            document.getElementById('variation-badge').textContent = 
+                calorieEstimate.variation.replace(/_/g, ' ');
+            document.getElementById('variation-confidence').textContent = 
+                `Confidence: ${(calorieEstimate.variation_confidence * 100).toFixed(0)}%`;
+            document.getElementById('variation-description').textContent = 
+                calorieEstimate.description || '';
+
+            // Ingredients
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.innerHTML = '';
+            calorieEstimate.detected_ingredients?.forEach(ingredient => {
+                const tag = document.createElement('span');
+                tag.className = 'ingredient-tag';
+                tag.textContent = ingredient.replace(/_/g, ' ');
+                ingredientsList.appendChild(tag);
+            });
+
+            // Calorie breakdown
+            const calorieBreakdown = document.getElementById('calorie-breakdown');
+            calorieBreakdown.innerHTML = '';
+            calorieEstimate.ingredient_breakdown?.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'breakdown-item';
+                div.innerHTML = `
+                    <div>
+                        <div class="breakdown-name">${item.name}</div>
+                        <div class="breakdown-portion">${item.portion}</div>
+                    </div>
+                    <div class="breakdown-calories">${item.calories} cal</div>
+                `;
+                calorieBreakdown.appendChild(div);
+            });
+
+            // Alternatives - Only show lower calorie, healthier options
+            const alternativesList = document.getElementById('alternatives-list');
+            alternativesList.innerHTML = '';
+            
+            const variationDetails = data.variation_details || {};
+            const currentVariation = calorieEstimate.variation;
+            const currentCalories = variationDetails[currentVariation]?.calories || calorieEstimate.total_calories;
+            
+            // Filter and sort alternatives by calories (ascending - lowest first)
+            let healthyAlternatives = Object.keys(variationDetails)
+                .filter(variation => variation !== currentVariation)
+                .filter(variation => variationDetails[variation].calories < currentCalories) // Only lower calorie
+                .sort((a, b) => variationDetails[a].calories - variationDetails[b].calories)
+                .slice(0, 5);
+            
+            // Update count badge
+            document.getElementById('alternatives-count').textContent = 
+                `${healthyAlternatives.length} found`;
+            
+            healthyAlternatives.forEach(variation => {
+                const varData = variationDetails[variation];
+                const caloriesSaved = currentCalories - varData.calories;
+                const div = document.createElement('div');
+                div.className = 'alternative-item';
+                div.innerHTML = `
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <span class="alternative-name">${variation.replace(/_/g, ' ')}</span>
+                        <span style="font-size: 0.8em; color: var(--sage-green); background: rgba(127,176,105,0.2); padding: 2px 8px; border-radius: 10px;">-${caloriesSaved} cal</span>
+                    </div>
+                    <span class="alternative-calories">${varData.calories} cal</span>
+                `;
+                alternativesList.appendChild(div);
+            });
+            
+            // If no healthier alternatives found
+            if (healthyAlternatives.length === 0) {
+                alternativesList.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--sage-green);">
+                        <span style="font-size: 1.5em;">🌟</span>
+                        <p style="margin-top: 10px; font-size: 0.95em;">This is already one of the healthier options!</p>
+                    </div>
+                `;
+            }
+
+            // Nutrition grid
+            const nutritionGrid = document.getElementById('nutrition-grid');
+            nutritionGrid.innerHTML = '';
+            if (calorieEstimate.nutrition_per_100g) {
+                const n = calorieEstimate.nutrition_per_100g;
+                const items = [
+                    { label: 'Calories', value: n.calories || 0 },
+                    { label: 'Protein', value: `${n.protein || 0}g` },
+                    { label: 'Carbs', value: `${n.carbs || 0}g` },
+                    { label: 'Fat', value: `${n.fat || 0}g` }
+                ];
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'nutrition-item';
+                    div.innerHTML = `
+                        <div class="nutrition-value">${item.value}</div>
+                        <div class="nutrition-label">${item.label}</div>
+                    `;
+                    nutritionGrid.appendChild(div);
+                });
+            }
+
+            resultsContent.style.display = 'block';
+        }
+
+        // Make CALORIE_DATABASE available for alternatives
+        window.CALORIE_DATABASE = {};
+
+        // Voice Input Variables
+        let recognition = null;
+        let detectedIngredients = [];
+
+        // Initialize Speech Recognition
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    document.getElementById('voice-status').style.display = 'block';
+                    document.getElementById('voice-text-display').style.display = 'none';
+                    document.getElementById('voice-ingredients-list').style.display = 'none';
+                    document.getElementById('voice-analyze-btn').style.display = 'none';
+                    document.getElementById('voice-btn').classList.add('recording');
+                    document.getElementById('voice-btn-text').textContent = 'Listening...';
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    processVoiceInput(transcript);
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    showError('Voice recognition error: ' + event.error);
+                    resetVoiceButton();
+                };
+
+                recognition.onend = function() {
+                    resetVoiceButton();
+                };
+
+                return true;
+            } else {
+                showError('Voice recognition is not supported in this browser. Please use Chrome or Edge.');
+                return false;
+            }
+        }
+
+        function resetVoiceButton() {
+            document.getElementById('voice-btn').classList.remove('recording');
+            document.getElementById('voice-btn-text').textContent = 'Tap & Speak Ingredients';
+            document.getElementById('voice-status').style.display = 'none';
+        }
+
+        function startVoiceInput() {
+            if (!recognition) {
+                if (!initSpeechRecognition()) return;
+            }
+            
+            try {
+                recognition.start();
+            } catch (e) {
+                // If already started, stop and restart
+                recognition.stop();
+                setTimeout(() => recognition.start(), 100);
+            }
+        }
+
+        function processVoiceInput(transcript) {
+            // Display detected text
+            document.getElementById('voice-detected-text').textContent = transcript;
+            document.getElementById('voice-text-display').style.display = 'block';
+
+            // Parse ingredients from transcript
+            detectedIngredients = parseIngredientsFromText(transcript);
+
+            // Display found ingredients
+            const tagsContainer = document.getElementById('voice-ingredients-tags');
+            tagsContainer.innerHTML = '';
+            
+            if (detectedIngredients.length > 0) {
+                detectedIngredients.forEach(ingredient => {
+                    const tag = document.createElement('span');
+                    tag.className = 'voice-ingredient-tag';
+                    tag.textContent = ingredient;
+                    tagsContainer.appendChild(tag);
+                });
+                document.getElementById('voice-ingredients-list').style.display = 'block';
+                document.getElementById('voice-analyze-btn').style.display = 'inline-flex';
+            } else {
+                tagsContainer.innerHTML = '<span style="color: var(--gray-500); font-size: 0.9em;">No recognized ingredients found. Try again!</span>';
+                document.getElementById('voice-ingredients-list').style.display = 'block';
+                document.getElementById('voice-analyze-btn').style.display = 'none';
+            }
+        }
+
+        function parseIngredientsFromText(text) {
+            // Common ingredient words to look for
+            const commonIngredients = [
+                'rice', 'chicken', 'beef', 'fish', 'salmon', 'tuna', 'egg', 'eggs', 'bread', 'pasta', 'noodles',
+                'potato', 'potatoes', 'tomato', 'tomatoes', 'onion', 'onions', 'garlic', 'carrot', 'carrots',
+                'peas', 'corn', 'spinach', 'lettuce', 'cucumber', 'pepper', 'bell pepper', 'broccoli', 'cauliflower',
+                'mushroom', 'mushrooms', 'cheese', 'cheddar', 'mozzarella', 'milk', 'butter', 'oil', 'olive oil',
+                'sugar', 'salt', 'flour', 'oats', 'yogurt', 'banana', 'bananas', 'apple', 'apples', 'orange',
+                'oranges', 'grapes', 'strawberry', 'strawberries', 'chocolate', 'nuts', 'almonds', 'walnuts',
+                'honey', 'jam', 'cream', 'mayonnaise', 'ketchup', 'mustard', 'soy sauce', 'vinegar', 'lemon',
+                'lime', 'ginger', 'turmeric', 'cumin', 'coriander', 'basil', 'oregano', 'thyme', 'rosemary',
+                'parsley', 'cilantro', 'mint', 'chili', 'pepper', 'cinnamon', 'cardamom', 'cloves', 'coconut',
+                'peanut', 'peanuts', 'tofu', 'lentils', 'beans', 'chickpeas', 'pomegranate', 'mango', 'pineapple',
+                'watermelon', 'papaya', 'guava', 'paneer', 'ghee', 'dal', 'sambar', 'rasam', 'curry', 'roti',
+                'chapati', 'naan', 'paratha', 'dosa', 'idli', 'vada', 'samosa', 'pakora', 'biryani', 'pulao',
+                'fried rice', 'burger', 'pizza', 'sandwich', 'wrap', 'salad', 'soup', 'dal makhani', 'butter chicken',
+                'palak paneer', 'chana masala', 'aloo gobi', 'bhindi masala', 'rajma', 'chole', 'pav bhaji',
+                'vada pav', 'dhokla', 'khandvi', 'thepla', 'khichdi', 'pongal', 'upma', 'poha', 'bhel puri',
+                'sev puri', 'pani puri', 'dahi puri', 'jalebi', 'gulab jamun', 'rasgulla', 'kheer', 'lassi',
+                'milk', 'water', 'juice', 'coffee', 'tea', 'soda', 'beer', 'wine', 'whiskey', 'vodka',
+                'chicken breast', 'chicken thigh', 'chicken wing', 'chicken leg', 'chicken curry', 'chicken tikka',
+                'mutton', 'lamb', 'pork', 'ham', 'bacon', 'sausage', 'salami', 'pepperoni', 'meatball',
+                'shrimp', 'prawn', 'crab', 'lobster', 'oyster', 'clam', 'mussel', 'scallop', 'squid',
+                'octopus', 'eggplant', 'brinjal', 'okra', 'bhindi', 'bitter gourd', 'karela', 'bottle gourd',
+                'lauki', 'ridge gourd', 'turiya', 'drumstick', 'moringa', 'beetroot', 'radish', 'turnip',
+                'sweet potato', 'yam', 'tapioca', 'cassava', 'colocasia', 'arbi', 'plantain', 'raw banana',
+                'sprouts', 'alfalfa', 'microgreens', 'kale', 'chard', 'collard', 'bok choy', 'napa cabbage',
+                'chinese cabbage', 'celery', 'asparagus', 'artichoke', 'fennel', 'leek', 'shallot', 'green onion',
+                'scallion', 'spring onion', 'chive', 'radicchio', 'endive', 'escarole', 'arugula', 'rocket',
+                'watercress', 'sorrel', 'purslane', 'amaranth', 'quinoa', 'millet', 'sorghum', 'barley',
+                'oats', 'wheat', 'semolina', 'suji', 'rava', 'vermicelli', 'sevai', 'noodles', 'pasta',
+                'spaghetti', 'macaroni', 'penne', 'fusilli', 'farfalle', 'rigatoni', 'lasagna', 'ravioli',
+                'gnocchi', 'soba', 'udon', 'ramen', 'rice noodles', 'vermicelli', 'glass noodles',
+                'tofu', 'tempeh', 'seitan', 'mock meat', 'plant based meat', 'veggie burger', 'vegan cheese',
+                'soy milk', 'almond milk', 'oat milk', 'coconut milk', 'cashew milk', 'rice milk',
+                'yogurt', 'curd', 'dahi', 'buttermilk', 'cheese', 'cottage cheese', 'cream cheese',
+                'sour cream', 'whipped cream', 'ice cream', 'gelato', 'sorbet', 'frozen yogurt',
+                'custard', 'pudding', 'mousse', 'cake', 'pastry', 'pie', 'tart', 'cookie', 'biscuit',
+                'cracker', 'breadstick', 'pretzel', 'croissant', 'bagel', 'donut', 'muffin', 'brownie',
+                'cupcake', 'pancake', 'waffle', 'crepe', 'french toast', 'bread pudding', 'rice pudding',
+                'tiramisu', 'cheesecake', 'apple pie', 'pumpkin pie', 'pecan pie', 'lemon tart',
+                'chocolate cake', 'vanilla cake', 'strawberry cake', 'carrot cake', 'red velvet cake',
+                'black forest cake', 'pineapple upside down cake', 'bundt cake', 'pound cake',
+                'sponge cake', 'angel food cake', 'chiffon cake', 'fruit cake', 'christmas cake',
+                'wedding cake', 'birthday cake', 'cupcakes', 'cake pops', 'macarons', 'macaroons',
+                'meringue', 'pavlova', 'baklava', 'knafeh', 'halwa', 'barfi', 'ladoo', 'jalebi',
+                'gulab jamun', 'rasgulla', 'rasmalai', 'kheer', 'payasam', 'phirni', 'shrikhand',
+                'amrakhand', 'mattha', 'lassi', 'chaas', 'buttermilk', 'sharbat', 'rokad sharbat',
+                'kokum juice', 'solkadhi', 'aam panna', 'jaljeera', 'neer more', 'curd rice',
+                'yogurt rice', 'dahi bhat', 'thayir sadam', 'mosaru anna', 'dahi chawal',
+                'golgappa', 'pani puri', 'fulki', 'puchka', 'gupchup', 'tikki', 'aloo chaat',
+                'dahi bhalla', 'dahi vada', 'dahi bada', 'thayir vadai', 'mosaru vade',
+                'perugu garelu', 'dahi bhalle', 'raita', 'koshimbir', 'pachadi', 'palya', 'bhaji',
+                'sabzi', 'sukhi bhaji', 'bharit', 'zhunka', 'pitla', 'zunka bhakar', 'thaalipeeth',
+                'bharli vangi', 'vangi bhath', 'masala bhaat', 'tamarind rice', 'lemon rice',
+                'coconut rice', 'tomato rice', 'curd rice', 'sambar rice', 'rasam rice',
+                'bisibelebath', 'vangi bath', 'puliyogare', 'pulihora', 'chitranna',
+                'kobbari annam', 'thengai sadam', 'ellu sadam', 'sesame rice', 'pudina rice',
+                'mint rice', 'coriander rice', 'kothamalli sadam', 'methi rice', 'venthaya sadam',
+                'ulava charu', 'pesarattu', 'uttapam', 'masala dosa', 'mysore masala dosa',
+                'rava dosa', 'neer dosa', 'set dosa', 'appam', 'idiappam', 'kozhukattai',
+                'modak', 'kadubu', 'sukhiyan', 'bonda', 'mysore bonda', 'batata vada',
+                'mirchi bajji', 'menasinakai bajji', 'capsicum bajji', 'brinjal bajji',
+                'keerai', 'greens', 'palak', 'methi', 'pudina', 'kothamalli', 'curry leaves',
+                'drumstick leaves', 'beetroot', 'radish', 'mooli', 'turnip', 'shalgam',
+                'sweet potato', 'shakarkandi', 'yam', 'suran', 'tapioca', 'cassava',
+                'colocasia', 'arbi', 'raw banana', 'vazhakka', 'plantain', 'nendran',
+                'shallot', 'sambar onion', 'cherry tomato', 'grape tomato', 'ridge gourd',
+                'beerakaya', 'bottle gourd', 'sorakaya', 'lauki', 'dudhi', 'bitter gourd',
+                'kakarakaya', 'karela', 'ash gourd', 'boodida gumadikaya', 'petha',
+                'snake gourd', 'potlakaya', 'padavalanga', 'ivy gourd', 'tindora', 'tendli',
+                'pointed gourd', 'parwal', 'potol', 'lotus stem', 'kamal kakdi', 'bamboo shoot',
+                'heart of palm', 'banana flower', 'vazhaipoo', 'banana stem', 'vazhaithandu',
+                'tender coconut', 'coconut water', 'mustard', 'rai', 'asafoetida', 'hing',
+                'fenugreek seeds', 'methi dana', 'poppy seeds', 'khus khus', 'cashew',
+                'kaju', 'pista', 'pistachio', 'dates', 'khajoor', 'fig', 'anjeer',
+                'raisins', 'kishmish', 'walnut', 'akhrot', 'almond', 'badam', 'hazelnut',
+                'pecan', 'brazil nut', 'macadamia', 'pinenut', 'chironji', 'charoli',
+                'amla', 'gooseberry', 'karonda', 'ber', 'jujube', 'tamarind', 'imli',
+                'kokum', 'prawn', 'jhinga', 'crab', 'kekd', 'lobster', 'turmeric', 'haldi',
+                'red chili', 'milagai', 'green chili', 'hari mirch', 'black pepper',
+                'kali mirch', 'cumin', 'jeera', 'coriander seed', 'dhaniya', 'fennel',
+                'saunf', 'star anise', 'cinnamon', 'dalchini', 'clove', 'laung', 'cardamom',
+                'elaichi', 'bay leaf', 'tej patta', 'nutmeg', 'jaiphal', 'mace', 'javitri',
+                'saffron', 'kesar', 'rose water', 'kewra', 'pandan', 'edible gold', 'silver leaf',
+                'paan', 'supari', 'betel nut', 'copra', 'sugar', 'shakkar', 'cheeni',
+                'brown sugar', 'jaggery', 'gur', 'vellam', 'palm sugar', 'palm jaggery',
+                'honey', 'shahad', 'maple syrup', 'date syrup', 'molasses', 'golden syrup',
+                'corn syrup', 'agave', 'stevia', 'wheat', 'gehu', 'atta', 'maida',
+                'all purpose flour', 'besan', 'gram flour', 'barley flour', 'jowar',
+                'sorghum', 'bajra', 'pearl millet', 'ragi', 'finger millet', 'millets',
+                'foxtail millet', 'little millet', 'kodo millet', 'barnyard millet',
+                'proso millet', 'amaranth', 'quinoa', 'semolina', 'suji', 'rava', 'vermicelli',
+                'sevai', 'puffed rice', 'murmura', 'pori', 'aval', 'poha', 'cornflakes',
+                'muesli', 'granola', 'soy chunk', 'meal maker', 'nutrela', 'seitan',
+                'mock meat', 'plant based meat', 'tofu', 'tempeh', 'edamame', 'seaweed',
+                'nori', 'kelp', 'spirulina', 'nutritional yeast', 'miso', 'kimchi',
+                'sauerkraut', 'pickle', 'achaar', 'uragai', 'chutney', 'pachadi',
+                'coconut chutney', 'tomato chutney', 'mint chutney', 'coriander chutney',
+                'garlic chutney', 'gun powder', 'milagai podi', 'curry powder',
+                'sambar powder', 'rasam powder', 'biryani masala', 'garam masala',
+                'pav bhaji masala', 'chaat masala', 'meat masala', 'chicken masala',
+                'paneer masala', 'tandoori masala', 'flaxseed', 'chia seed', 'basil seed',
+                'sabja', 'sunflower seed', 'pumpkin seed', 'watermelon seed', 'lotus seed',
+                'makhana', 'fox nut', 'kiwi', 'avocado', 'dragon fruit', 'passion fruit',
+                'rambutan', 'lychee', 'mangosteen', 'durian', 'breadfruit', 'jamun',
+                'java plum', 'black plum', 'star fruit', 'carambola', 'kamrakh',
+                'chikoo', 'sapodilla', 'sapota', 'bilimbi', 'cucumber tree', 'falsa',
+                'currant', 'cranberry', 'blueberry', 'raspberry', 'blackberry', 'mulberry'
+            ];
+
+            const found = [];
+            const lowerText = text.toLowerCase();
+
+            // Check for each ingredient
+            commonIngredients.forEach(ingredient => {
+                if (lowerText.includes(ingredient.toLowerCase())) {
+                    // Avoid duplicates
+                    if (!found.includes(ingredient)) {
+                        found.push(ingredient);
+                    }
+                }
+            });
+
+            return found;
+        }
+
+        async function analyzeVoiceIngredients() {
+            if (detectedIngredients.length === 0) return;
+
+            const voiceAnalyzeBtn = document.getElementById('voice-analyze-btn');
+            voiceAnalyzeBtn.disabled = true;
+            voiceAnalyzeBtn.innerHTML = '<span>⏳</span><span>Analyzing...</span>';
+
+            // Get serving size
+            const servingSizeMap = {
+                'small': 0.7,
+                'medium': 1.0,
+                'large': 1.4,
+                'extra_large': 1.8
+            };
+            const servingSize = servingSizeMap[document.getElementById('serving-size').value] || 1.0;
+
+            try {
+                const response = await fetch('/api/analyze-ingredients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ingredients: detectedIngredients,
+                        serving_size: servingSize
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    displayVoiceResults(data);
+                } else {
+                    showError(data.error || 'Failed to analyze ingredients');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                voiceAnalyzeBtn.disabled = false;
+                voiceAnalyzeBtn.innerHTML = '<span>🔍</span><span>Analyze Ingredients</span>';
+            }
+        }
+
+        function displayVoiceResults(data) {
+            // Hide placeholder and loading, show results
+            placeholder.style.display = 'none';
+            loading.style.display = 'none';
+
+            // Update food name
+            document.getElementById('food-name').textContent = data.food_name || 'Voice Input Analysis';
+
+            // Update confidence badge for voice input
+            document.getElementById('confidence-badge').textContent = 'Voice Recognition';
+            document.getElementById('confidence-fill').style.width = '100%';
+
+            // Update calorie display
+            document.getElementById('calorie-number').textContent = Math.round(data.total_calories || 0);
+
+            // Update serving value
+            const servingSizeText = document.getElementById('serving-size');
+            const servingLabel = servingSizeText.options[servingSizeText.selectedIndex].text;
+            document.getElementById('serving-value').textContent = servingLabel.split('(')[0].trim();
+
+            // Update ingredients count
+            document.getElementById('ingredients-count').textContent = `${data.breakdown ? data.breakdown.length : 0} items`;
+
+            // Update variation section for voice input
+            document.getElementById('variation-badge').textContent = 'Voice Analysis';
+            document.getElementById('variation-confidence').textContent = 'Based on spoken ingredients';
+            document.getElementById('variation-description').textContent = 
+                `Calculated from: ${data.input_ingredients ? data.input_ingredients.join(', ') : 'N/A'}`;
+
+            // Update ingredients list
+            const ingredientsList = document.getElementById('ingredients-list');
+            ingredientsList.innerHTML = '';
+            if (data.input_ingredients) {
+                data.input_ingredients.forEach(ingredient => {
+                    const tag = document.createElement('span');
+                    tag.className = 'ingredient-tag';
+                    tag.textContent = ingredient;
+                    ingredientsList.appendChild(tag);
+                });
+            }
+
+            // Update calorie breakdown
+            const breakdownList = document.getElementById('calorie-breakdown');
+            breakdownList.innerHTML = '';
+            if (data.breakdown) {
+                data.breakdown.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'breakdown-item';
+                    div.innerHTML = `
+                        <div class="breakdown-info">
+                            <span class="breakdown-rank">${index + 1}</span>
+                            <div class="breakdown-details">
+                                <div class="breakdown-name">${item.name}</div>
+                                <div class="breakdown-grams">${Math.round(item.grams)}g</div>
+                            </div>
+                        </div>
+                        <div class="breakdown-calories">
+                            <span class="breakdown-number">${Math.round(item.calories)}</span>
+                            <span class="breakdown-unit">cal</span>
+                            <span class="breakdown-percentage">(${item.percentage}%)</span>
+                        </div>
+                    `;
+                    breakdownList.appendChild(div);
+                });
+            }
+
+            // For voice input, show a simple alternatives message
+            const alternativesList = document.getElementById('alternatives-list');
+            alternativesList.innerHTML = '';
+            document.getElementById('alternatives-count').textContent = 'N/A';
+            
+            alternativesList.innerHTML = `
+                <div style="text-align: center; padding: 20px; color: var(--gray-500);">
+                    <span style="font-size: 1.5em;">🎙️</span>
+                    <p style="margin-top: 10px; font-size: 0.95em;">
+                        Upload a food image for healthier alternatives and detailed nutrition analysis
+                    </p>
+                </div>
+            `;
+
+            // Update nutrition grid with simple values
+            const nutritionGrid = document.getElementById('nutrition-grid');
+            nutritionGrid.innerHTML = '';
+            const items = [
+                { label: 'Calories', value: Math.round(data.total_calories || 0) },
+                { label: 'Protein', value: '~' + Math.round((data.total_calories || 0) * 0.15 / 4) + 'g' },
+                { label: 'Carbs', value: '~' + Math.round((data.total_calories || 0) * 0.5 / 4) + 'g' },
+                { label: 'Fat', value: '~' + Math.round((data.total_calories || 0) * 0.35 / 9) + 'g' }
+            ];
+            items.forEach(item => {
+                const div = document.createElement('div');
+                div.className = 'nutrition-item';
+                div.innerHTML = `
+                    <div class="nutrition-value">${item.value}</div>
+                    <div class="nutrition-label">${item.label}</div>
+                `;
+                nutritionGrid.appendChild(div);
+            });
+
+            resultsContent.style.display = 'block';
+            
+            // Scroll to results
+            resultsContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Edit Ingredients Feature Variables
+        let currentEditingIngredients = [];
+        let originalIngredients = [];
+
+        // Common ingredients for suggestions
+        const commonIngredientSuggestions = [
+            'rice', 'chicken', 'beef', 'fish', 'egg', 'eggs', 'bread', 'pasta', 'noodles',
+            'potato', 'potatoes', 'tomato', 'tomatoes', 'onion', 'onions', 'garlic', 'carrot', 'carrots',
+            'peas', 'corn', 'spinach', 'lettuce', 'cucumber', 'pepper', 'broccoli', 'cauliflower',
+            'mushroom', 'mushrooms', 'cheese', 'milk', 'butter', 'oil', 'olive oil',
+            'sugar', 'salt', 'flour', 'yogurt', 'banana', 'apple', 'orange',
+            'chocolate', 'nuts', 'almonds', 'walnuts', 'honey', 'cream',
+            'paneer', 'ghee', 'dal', 'roti', 'chapati', 'naan', 'paratha', 'dosa', 'idli',
+            'biryani', 'pizza', 'burger', 'sandwich', 'salad', 'soup',
+            'butter chicken', 'palak paneer', 'chana masala', 'sambar', 'rasam',
+            'turmeric', 'cumin', 'coriander', 'garam masala', 'chili powder'
+        ];
+
+        function toggleEditIngredients() {
+            const editPanel = document.getElementById('edit-ingredients-panel');
+            const ingredientsList = document.getElementById('ingredients-list');
+            const editBtn = document.getElementById('edit-ingredients-btn');
+            
+            if (editPanel.style.display === 'none') {
+                // Show edit panel
+                editPanel.style.display = 'block';
+                ingredientsList.style.display = 'none';
+                editBtn.innerHTML = '<span>✕</span> Close';
+                editBtn.style.background = 'linear-gradient(135deg, #EF4444 0%, #DC2626 100%)';
+                
+                // Get current ingredients from display
+                const currentTags = ingredientsList.querySelectorAll('.ingredient-tag');
+                currentEditingIngredients = Array.from(currentTags).map(tag => tag.textContent);
+                originalIngredients = [...currentEditingIngredients];
+                
+                renderEditIngredients();
+                showSuggestedIngredients();
+            } else {
+                // Hide edit panel
+                closeEditPanel();
+            }
+        }
+
+        function closeEditPanel() {
+            const editPanel = document.getElementById('edit-ingredients-panel');
+            const ingredientsList = document.getElementById('ingredients-list');
+            const editBtn = document.getElementById('edit-ingredients-btn');
+            
+            editPanel.style.display = 'none';
+            ingredientsList.style.display = 'flex';
+            editBtn.innerHTML = '<span>✏️</span> Edit';
+            editBtn.style.background = 'linear-gradient(135deg, var(--peach-400) 0%, var(--peach-500) 100%)';
+        }
+
+        function cancelEditIngredients() {
+            currentEditingIngredients = [...originalIngredients];
+            closeEditPanel();
+        }
+
+        function renderEditIngredients() {
+            const container = document.getElementById('edit-ingredients-tags');
+            container.innerHTML = '';
+            
+            if (currentEditingIngredients.length === 0) {
+                container.innerHTML = '<span style="color: var(--gray-400); font-size: 0.9em;">No ingredients yet. Add some below!</span>';
+                return;
+            }
+            
+            currentEditingIngredients.forEach((ingredient, index) => {
+                const tag = document.createElement('span');
+                tag.className = 'edit-ingredient-tag';
+                tag.innerHTML = `${ingredient} <span class="remove-icon">✕</span>`;
+                tag.onclick = () => removeIngredient(index);
+                container.appendChild(tag);
+            });
+        }
+
+        function removeIngredient(index) {
+            currentEditingIngredients.splice(index, 1);
+            renderEditIngredients();
+        }
+
+        function addIngredient() {
+            const input = document.getElementById('add-ingredient-input');
+            const ingredient = input.value.trim();
+            
+            if (!ingredient) return;
+            
+            // Check for duplicates
+            if (currentEditingIngredients.includes(ingredient)) {
+                showError('This ingredient is already added!');
+                setTimeout(clearError, 2000);
+                return;
+            }
+            
+            currentEditingIngredients.push(ingredient);
+            input.value = '';
+            renderEditIngredients();
+        }
+
+        function addSuggestedIngredient(ingredient) {
+            if (currentEditingIngredients.includes(ingredient)) {
+                showError('Already added!');
+                setTimeout(clearError, 1500);
+                return;
+            }
+            currentEditingIngredients.push(ingredient);
+            renderEditIngredients();
+        }
+
+        function showSuggestedIngredients() {
+            const container = document.getElementById('suggested-ingredients');
+            container.innerHTML = '<span style="color: var(--gray-400); font-size: 0.8em; width: 100%;">Click to add quickly:</span>';
+            
+            // Show random 10 suggestions that aren't already added
+            const available = commonIngredientSuggestions.filter(i => !currentEditingIngredients.includes(i));
+            const suggestions = available.sort(() => 0.5 - Math.random()).slice(0, 10);
+            
+            suggestions.forEach(ingredient => {
+                const tag = document.createElement('span');
+                tag.className = 'suggested-tag';
+                tag.textContent = ingredient;
+                tag.onclick = () => addSuggestedIngredient(ingredient);
+                container.appendChild(tag);
+            });
+        }
+
+        async function recalculateCalories() {
+            if (currentEditingIngredients.length === 0) {
+                showError('Please add at least one ingredient!');
+                return;
+            }
+            
+            const recalcBtn = document.querySelector('.recalculate-btn');
+            recalcBtn.disabled = true;
+            recalcBtn.innerHTML = '<span>⏳</span> Recalculating...';
+            
+            // Get serving size
+            const servingSizeMap = {
+                'small': 0.7,
+                'medium': 1.0,
+                'large': 1.4,
+                'extra_large': 1.8
+            };
+            const servingSize = servingSizeMap[document.getElementById('serving-size').value] || 1.0;
+            
+            try {
+                const response = await fetch('/api/analyze-ingredients', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ingredients: currentEditingIngredients,
+                        serving_size: servingSize
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Update the ingredients list display
+                    const ingredientsList = document.getElementById('ingredients-list');
+                    ingredientsList.innerHTML = '';
+                    currentEditingIngredients.forEach(ingredient => {
+                        const tag = document.createElement('span');
+                        tag.className = 'ingredient-tag';
+                        tag.textContent = ingredient;
+                        ingredientsList.appendChild(tag);
+                    });
+                    
+                    // Update calorie display
+                    document.getElementById('calorie-number').textContent = Math.round(data.total_calories || 0);
+                    
+                    // Update ingredients count
+                    document.getElementById('ingredients-count').textContent = `${data.breakdown ? data.breakdown.length : 0} items`;
+                    
+                    // Update variation description
+                    document.getElementById('variation-description').textContent = 
+                        `Updated ingredients: ${data.input_ingredients ? data.input_ingredients.join(', ') : 'N/A'}`;
+                    
+                    // Update calorie breakdown
+                    const breakdownList = document.getElementById('calorie-breakdown');
+                    breakdownList.innerHTML = '';
+                    if (data.breakdown) {
+                        data.breakdown.forEach((item, index) => {
+                            const div = document.createElement('div');
+                            div.className = 'breakdown-item';
+                            div.innerHTML = `
+                                <div class="breakdown-info">
+                                    <span class="breakdown-rank">${index + 1}</span>
+                                    <div class="breakdown-details">
+                                        <div class="breakdown-name">${item.name}</div>
+                                        <div class="breakdown-grams">${Math.round(item.grams)}g</div>
+                                    </div>
+                                </div>
+                                <div class="breakdown-calories">
+                                    <span class="breakdown-number">${Math.round(item.calories)}</span>
+                                    <span class="breakdown-unit">cal</span>
+                                    <span class="breakdown-percentage">(${item.percentage}%)</span>
+                                </div>
+                            `;
+                            breakdownList.appendChild(div);
+                        });
+                    }
+                    
+                    // Update nutrition grid
+                    const nutritionGrid = document.getElementById('nutrition-grid');
+                    nutritionGrid.innerHTML = '';
+                    const items = [
+                        { label: 'Calories', value: Math.round(data.total_calories || 0) },
+                        { label: 'Protein', value: '~' + Math.round((data.total_calories || 0) * 0.15 / 4) + 'g' },
+                        { label: 'Carbs', value: '~' + Math.round((data.total_calories || 0) * 0.5 / 4) + 'g' },
+                        { label: 'Fat', value: '~' + Math.round((data.total_calories || 0) * 0.35 / 9) + 'g' }
+                    ];
+                    items.forEach(item => {
+                        const div = document.createElement('div');
+                        div.className = 'nutrition-item';
+                        div.innerHTML = `
+                            <div class="nutrition-value">${item.value}</div>
+                            <div class="nutrition-label">${item.label}</div>
+                        `;
+                        nutritionGrid.appendChild(div);
+                    });
+                    
+                    // Save as original
+                    originalIngredients = [...currentEditingIngredients];
+                    
+                    // Close edit panel
+                    closeEditPanel();
+                    
+                    // Show success
+                    showError('✅ Calories recalculated successfully!');
+                    setTimeout(clearError, 2000);
+                } else {
+                    showError(data.error || 'Failed to recalculate');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            } finally {
+                recalcBtn.disabled = false;
+                recalcBtn.innerHTML = '<span>🔄</span> Recalculate Calories';
+            }
+        }
+
+        // Allow Enter key to add ingredient
+        document.addEventListener('DOMContentLoaded', function() {
+            const input = document.getElementById('add-ingredient-input');
+            if (input) {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addIngredient();
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
