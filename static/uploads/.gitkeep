@@ -1,0 +1,2 @@
+# This file ensures the uploads folder is tracked by git
+# Vercel uses ephemeral storage, so uploaded files won't persist
